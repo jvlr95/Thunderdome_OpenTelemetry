@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: thunderdome
+  name: thunderdome
+  # alterado para teste
+  namespace: thunderdome-k3d
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thunderdome
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: thunderdome
+    spec:
+      #affinity:
+      #  nodeAffinity:
+      #    requiredDuringSchedulingIgnoredDuringExecution:
+      #      nodeSelectorTerms:
+      #      - matchExpressions:
+      #        - key: type
+      #          operator: In
+      #          values:
+      #          - development
+      containers:
+        - name: thunderdome
+          image: stevenweathers/thunderdome-planning-poker:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: COOKIE_SECURE
+              value: "false"
+            - name: HTTP_WRITE_TIMEOUT
+              value: "15"
+            - name: HTTP_READ_TIMEOUT
+              value: "15"
+            - name: HTTP_IDLE_TIMEOUT
+              value: "15"
+            - name: HTTP_READ_HEADER_TIMEOUT
+              value: "15"
+            - name: DB_NAME
+              value: "database_master"
+            - name: DB_HOST
+              value: postgres-service.thunderdome-k3d.svc.cluster.local
+            - name: DB_PORT
+              value: "5432"
+            - name: APP_DOMAIN
+              value: localhost:8080
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASS
+              value: "admin"
+            - name: SMTP_ENABLED
+              value: "true"
+            - name: SMTP_HOST
+              value: localhost
+            - name: SMTP_PORT
+              value: "25"
+            - name: SMTP_AUTH
+              value: PLAIN
+            - name: SMTP_SECURE
+              value: "true"
+            - name: SMTP_SKIP_TLS_VERIFY
+              value: "false"
+            # VARIAVEIS DE AMBIENTE -- CONFIGMAP -----------------------------#
+            # - name: DB_NAME
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       key: DB_NAME
+            #       name: thunderdome-config
+            # - name: DB_HOST
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       key: DB_HOST
+            #       name: thunderdome-config
+            # - name: DB_PORT
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       key: DB_PORT
+            #       name: thunderdome-config
+            # - name: APP_DOMAIN
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       key: APP_DOMAIN
+            #       name: thunderdome-config
+            # VARIAVEIS SECRETAS -- SECRETS ----------------------------------#
+            # - name: DB_USER
+            #   valueFrom:
+            #     secretKeyRef:
+            #       key: DB_USER
+            #       name: thunderdome-sec
+            # - name: DB_PASS
+            #   valueFrom:
+            #     secretKeyRef:
+            #       key: DB_PASS
+            #       name: thunderdome-sec
+            # CONFIG EMAIL ---------------------------------------------------#
+            # - name: SMTP_PASS
+            #   valueFrom: 
+            #     secretKeyRef:
+            #       key: PASSWD
+            #       name: thunderdome-sec
+            # - name: SMTP_ENABLED
+            #   value: "false"
+            # - name: SMTP_HOST
+            #   value: smtp.office365.com
+            # - name: SMTP_PORT
+            #   value: "587"
+            # - name: SMTP_USER
+            #   value: no-reply@solinftec.com
+            # - name: SMTP_SECURE
+            #   value: "true"
+            # - name: SMTP_SKIP_TLS_VERIFY
+            #   value: "false"
+            # ----------------------------------------------------------------#
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8080

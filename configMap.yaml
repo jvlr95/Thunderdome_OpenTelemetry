@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: thunderdome-k3d
+data:
+  init.sql: |
+    CREATE DATABASE database_master
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: thunderdome-config
+#   namespace: thunderdome-k3d
+# data:
+#   DB_NAME: "database_master"
+#   # DB_USER: "thunderdome"
+#   DB_HOST: "postgres-service:5342"
+#   DB_PORT: "5432"
+#   APP_DOMAIN: "127.0.0.1"
+
